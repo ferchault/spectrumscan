@@ -26,16 +26,16 @@ def spectrum(values):
 # Define the "acceptable" range
 import matplotlib.pyplot as plt
 plt.plot(grid_short, experiment_short, label='Experimental')
-upper_limit = spectrum((0.147, 1, 1, 0.5, 0, 0))
+upper_limit = spectrum((0.145, 1, 1, 0.5, 0, 0)) 
 upper_limit = np.maximum(upper_limit, experiment_short + 300)
-upper_limit = np.maximum(upper_limit, experiment_short * 2)
+#upper_limit = np.maximum(upper_limit, experiment_short * 2)
+upper_limit[:10] += 4000
 
-lower_limit = experiment_short * 0.5
-lower_limit = np.minimum(lower_limit, experiment_short - 2000)
+lower_limit = experiment_short 
+lower_limit = np.minimum(lower_limit, experiment_short - 4000)
 lower_limit = np.maximum(lower_limit, 0)
 plt.fill_between(grid_short, lower_limit, upper_limit, alpha=0.2, label='Accepted')
 plt.legend(loc="upper left")
-
 
 # %%
 def draw_random_from_molecular_distribution(centers, mae, N):
@@ -63,18 +63,42 @@ def draw_random_from_molecular_distribution(centers, mae, N):
     return np.vstack((S1, S2, S3, osz1, osz2, osz3))
 
 def monte_carlo_probability(candidate, N):
-    candidates = draw_random_from_molecular_distribution(dbg, mae, N).T
+    candidates = draw_random_from_molecular_distribution(candidate, mae, N).T
     success = 0
     trials = 0
+    tmax = max(experiment_short)
     for candidate in candidates:
         s = spectrum(candidate)
         trials += 1
-        rescale = max(s) / max(experiment_short)
+        rescale = max(s) / tmax
         if rescale > EXPERIMENT_UNCERTAIN_SCALE or rescale < 1/EXPERIMENT_UNCERTAIN_SCALE:
             continue
         s /= rescale
         if np.all(s >= lower_limit) and np.all(s <= upper_limit):
             success += 1
     return success / N
+
+
+# %%
+monte_carlo_probability(dbg, 10000)
+
+# %%
+q = np.genfromtxt("/mnt/c/Users/guido/data/oszS", delimiter=",", invalid_raise=False)
+q = q[~np.isnan(q).any(axis=1)]
+
+# %%
+len(q)
+
+# %%
+subset = 10000
+N = 100
+probabilities = np.zeros(subset)
+for i in range(subset):
+    probabilities[i] = monte_carlo_probability(q[i], N)
+
+# %%
+plt.hist(probabilities, range=(0, 1), bins=100,log=True, )
+plt.xlabel("Probability of agreeing with experiment")
+plt.ylabel("Count")
 
 # %%
