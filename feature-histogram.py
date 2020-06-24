@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import numpy as np
 
 def read_file():
 	q = np.fromfile("features", sep=" ", dtype=np.int)
