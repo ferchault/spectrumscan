@@ -1,15 +1,6 @@
 #!/usr/bin/env python
+import sys
 
-from time import time
-
-start=time()
-
-#f = open("/mnt/FOXTROT/PRODUCTION/batches/A/molecules", "r")
-#f = open("test.A", "r")
-f = open("line.dat", "r")
-#f = open("/mnt/FOXTROT/PRODUCTION/batches/B/molecules", "r")
-lines = f.readlines()
-f.close()
 
 def mol2bonds(molstring):
     cobindungen = []
@@ -36,10 +27,6 @@ def mol2bonds(molstring):
     
         counts[elements[a]+elements[b]] += 1
 
-    print('OH',hobindungen)
-    print('OC',cobindungen)
-    print('OO',oobindungen)
-    
     for i in range(len(cobindungen)):
         first=cobindungen[i][0]   # Sauerstoff
         second=cobindungen[i][1]   # Kohlenstoff
@@ -51,8 +38,6 @@ def mol2bonds(molstring):
             dummy=0
         else:
             carbonyl.append([first, second])
-
-    print('Carbonara',carbonyl)
 
     if len(oobindungen) > 1:
         for i in range(len(oobindungen)):
@@ -128,22 +113,7 @@ def mol2bonds(molstring):
     n_quad= len(oooo)-2*n_quint-3*n_sext-4*n_sept
     n_trip= len(ooo)-2*n_quad-3*n_quint-4*n_sext-5*n_sept
     n_dup= len(oobindungen)-2*n_trip-3*n_quad-4*n_quint-5*n_sext-6*n_sept
-    print(counts,'7 OOOOOOO:',n_sept,'6 OOOOOO:',n_sext,'5 OOOOO:',n_quint,'4 OOOO:',n_quad,'3 OOO:',n_trip,'2 OO:',n_dup,'Carbonyl:',len(carbonyl))
+    print(counts['OO'], counts['OC'],counts['OH'],counts['CC'],counts['CH'],n_sept,n_sext,n_quint,n_quad,n_trip,n_dup,len(carbonyl))
     
-    return
-    #return counts
-    
-for line in lines:
-    print(line)
+for line in open(sys.argv[1]):
     mol2bonds(line)
-
-
-end=time()
-print('TIME:',end-start)
-
-#if __name__ == "__main__":
-#	molstring = "#OUT 7-8 13-14 8-9 14-15 9-10 15-16 10-11 16-17 11-12 17-18 7-12 13-18 1-19 2-20 3-21 4-22 5-23 8-24 9-25 0-10 10-26 1-11 11-27 2-12 12-28 0-14 3-15 4-16 5-16 6-17 18-29 18-30 7-13"
-
-
-
-
