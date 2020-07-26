@@ -44,6 +44,7 @@ class IntegerPartitions(object):
             return IntegerPartitions._do_partition(total, maxelements)
 
 def treat_molstring(molstring):
+	NDOUBLE = 0
 	# get CC bond count
 	parts = molstring.split()
 	parts = [_.split("-") for _ in parts[1:]]
@@ -114,6 +115,7 @@ def treat_molstring(molstring):
 				# no other bond for this oxygen, carboxyl group
 				G.add_edge("lhs_%d" % a, "rhs_%d" % b)
 				G.add_edge("lhs_%d" % b, "rhs_%d" % a)
+				NDOUBLE += 1
 		else:
 			# CC bond done separately
 			continue
@@ -127,6 +129,7 @@ def treat_molstring(molstring):
 			# double bond
 			G.add_edge("lhs_%d" % a, "rhs_%d" % b)
 			G.add_edge("lhs_%d" % b, "rhs_%d" % a)
+			NDOUBLE += 1
 
 	startnodes = [_ for _ in G.nodes() if _.startswith("lhs_")]
 	endnodes = [_ for _ in G.nodes()]
@@ -156,13 +159,25 @@ def treat_molstring(molstring):
 				break
 		else:
 			accepted.append(path)
-			print (path)
-		
-			
-	
-	
-	
-	
-treat_molstring("#OUT 7-8 13-14 8-9 14-15 9-10 15-16 10-11 16-17 11-12 17-18 7-12 13-18 0-4 1-6 2-4 2-5 3-5 3-6 7-19 8-20 9-21 10-22 11-23 0-12 13-24 14-25 1-15 16-26 17-27 17-28 18-29 18-30")
-print ("....")
-treat_molstring("#OUT 7-8 13-14 8-9 14-15 9-10 15-16 10-11 16-17 11-12 17-18 7-12 13-18 10-13 0-15 1-2 2-3 3-4 4-5 5-6 6-9 1-19 8-20 7-21 12-22 11-23 14-24 16-25 16-26 17-27 17-28 18-29 18-30")
+
+	# count allenes
+	NALLENES = 0
+	for node in G.nodes():
+		if node.startswith("lhs_"):
+			continue
+		if G.in_degree(node) == 2:
+			NALLENES += 1
+
+	# print metrics
+	chains1 = len([_ for _ in accepted if len(_) == 2])
+	chains2 = len([_ for _ in accepted if len(_) == 4])
+	chains3 = len([_ for _ in accepted if len(_) == 6])
+	chains4 = len([_ for _ in accepted if len(_) == 8])
+	chains5 = len([_ for _ in accepted if len(_) == 10])
+	print (NDOUBLE, chains1, chains2, chains3, chains4, chains5, NALLENES)
+
+#treat_molstring("#OUT 7-8 13-14 8-9 14-15 9-10 15-16 10-11 16-17 11-12 17-18 7-12 13-18 0-4 1-6 2-4 2-5 3-5 3-6 7-19 8-20 9-21 10-22 11-23 0-12 13-24 14-25 1-15 16-26 17-27 17-28 18-29 18-30")
+#treat_molstring("#OUT 7-8 13-14 8-9 14-15 9-10 15-16 10-11 16-17 11-12 17-18 7-12 13-18 10-13 0-15 1-2 2-3 3-4 4-5 5-6 6-9 1-19 8-20 7-21 12-22 11-23 14-24 16-25 16-26 17-27 17-28 18-29 18-30")
+
+for line in open(sys.argv[1]):
+	treat_molstring(line)
