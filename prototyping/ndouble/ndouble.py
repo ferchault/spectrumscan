@@ -72,7 +72,6 @@ def treat_molstring(molstring):
 					break
 			else:
 				base[b-7] += 1				
-	print (base)
 	
 	# find partitions
 	attributions = [(0, 1), (1, 2), (2,3), (3,4), (4,5), (5,0),    (6, 7), (7,8), (8,9), (9,10), (10, 11), (11, 6)]
@@ -130,21 +129,23 @@ def treat_molstring(molstring):
 			G.add_edge("lhs_%d" % b, "rhs_%d" % a)
 
 	startnodes = [_ for _ in G.nodes() if _.startswith("lhs_")]
-	endnodes = [_ for _ in startnodes if G.out_degree(_) == 0]
+	endnodes = [_ for _ in G.nodes()]
 	found_paths = []
 	for startnode in startnodes:
 		# include the up to one neighbor that has a single bond
 		in_edges = []
 		for u,v in G.in_edges(startnode):
-			in_edges = [u]
-		for path in nx.all_simple_paths(G,startnode,endnodes + in_edges):
-			if path[-1].startswith("lhs"):
-				path = path[:-1] # strip last element which is single bonded
-			for f in found_paths:
-				if set(f) == set(path):
-					break
-			else:
-				found_paths.append(path)
+			in_edges.append(u)
+		myendnodes = [_ for _ in endnodes + in_edges if _ != startnode]
+		for endnode in myendnodes:
+			for path in nx.all_simple_paths(G,startnode,endnode):
+				if path[-1].startswith("lhs"):
+					path = path[:-1] # strip last element which is single bonded
+				for f in found_paths:
+					if set(f) == set(path):
+						break
+				else:
+					found_paths.append(path)
 	# remove alternating directionality (enforced above)
 	found_paths = [[_.split("_")[1] for _ in __] for __ in found_paths]
 	# remove contained paths
@@ -162,5 +163,6 @@ def treat_molstring(molstring):
 	
 	
 	
-#treat_molstring("#OUT 7-8 13-14 8-9 14-15 9-10 15-16 10-11 16-17 11-12 17-18 7-12 13-18 0-4 1-6 2-4 2-5 3-5 3-6 7-19 8-20 9-21 10-22 11-23 0-12 13-24 14-25 1-15 16-26 17-27 17-28 18-29 18-30")
+treat_molstring("#OUT 7-8 13-14 8-9 14-15 9-10 15-16 10-11 16-17 11-12 17-18 7-12 13-18 0-4 1-6 2-4 2-5 3-5 3-6 7-19 8-20 9-21 10-22 11-23 0-12 13-24 14-25 1-15 16-26 17-27 17-28 18-29 18-30")
+print ("....")
 treat_molstring("#OUT 7-8 13-14 8-9 14-15 9-10 15-16 10-11 16-17 11-12 17-18 7-12 13-18 10-13 0-15 1-2 2-3 3-4 4-5 5-6 6-9 1-19 8-20 7-21 12-22 11-23 14-24 16-25 16-26 17-27 17-28 18-29 18-30")
