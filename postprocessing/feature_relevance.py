@@ -8,8 +8,12 @@ import matplotlib.pyplot as plt
 FEATURENAMES = "OO OC OH CC CH O7 O6 O5 O4 O3 O2 =O Aromatic C=C=C (C=C-C)5 (C=C-C)4 (C=C-C)3 (C=C-C)2 (C=C-C)1 C=C".split()
 
 # read and merge folders A...ZE
-df = pd.read_csv("data/FTCOUNT", sep=" ", names="feature value state count".split())
+df = pd.read_csv("data/ok", sep=" ", names="feature value state count".split())
 df = df.groupby("feature value state".split()).sum().reset_index()
+# for idx, row in df.groupby("feature value".split()).sum()['count'].reset_index().iterrows():
+# 	print (FEATURENAMES[int(row['feature'])], row['value'], row['count'])
+# import sys
+# sys.exit(1)
 # give columns for states
 df = df.pivot_table(
     index="feature value".split(), columns="state", values="count"
@@ -163,4 +167,5 @@ axConjugated.legend(
 axConjugated.set_title("Conjugated double\nbond chains of length $n$")
 axConjugated.set_xlabel("Frequency / Molecule")
 plt.subplots_adjust(hspace=0, wspace=0)
+plt.savefig("features.pdf", bbox_inches="tight")
 # %%
