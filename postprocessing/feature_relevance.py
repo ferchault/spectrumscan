@@ -67,5 +67,18 @@ do_plot(3, 60)
 do_plot(4, 60)
 
 #%%
-df
+s = df
+total = s["count"].sum()
+s = s.query("cat1 != 'B'")
+stable = s["count"].sum()
+s = s.query("OH != 0")
+hasOH = s["count"].sum()
+s = s.query("O7 == 0 & O6 == 0 &O5 == 0 &O4 == 0 &O3 == 0 ")
+nolongchains = s["count"].sum()
+s = s[s["C-O-C'"] > 0]
+hasbridge = s["count"].sum()
+s = s.query("Aromatic>0")
+isaromatic = s["count"].sum()
+total, stable, hasOH, nolongchains, hasbridge, isaromatic
+
 # region
