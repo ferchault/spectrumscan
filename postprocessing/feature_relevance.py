@@ -79,6 +79,10 @@ s = s[s["C-O-C'"] > 0]
 hasbridge = s["count"].sum()
 s = s.query("Aromatic>0")
 isaromatic = s["count"].sum()
-total, stable, hasOH, nolongchains, hasbridge, isaromatic
+s = s.query("cat1 == 'M'")
+matchspectrum1 = s["count"].sum()
+total, stable, hasOH, nolongchains, hasbridge, isaromatic, matchspectrum1
 
+# region
+s.groupby("cat1").sum()
 # region
